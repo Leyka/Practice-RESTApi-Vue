@@ -3,6 +3,7 @@ from flask_restful import Resource
 from werkzeug.security import generate_password_hash, check_password_hash
 from api import app, db
 from api.models import User
+from api.utils.security import token_required
 import secrets, jwt, datetime
 
 def check_and_get_user(public_id): 
@@ -15,6 +16,7 @@ def check_and_get_user(public_id):
 
 class UserIdREST(Resource):
   # Returns a specific user 
+  @token_required
   def get(self, public_id): 
     user = check_and_get_user(public_id)
     return jsonify({'user' : user.to_dict()})

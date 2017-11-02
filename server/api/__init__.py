@@ -18,5 +18,4 @@ api.add_resource(UserREST, '/user')
 api.add_resource(UserIdREST, '/user/<public_id>')
 api.add_resource(LogInREST, '/login')
 
-
 app.register_blueprint(api_bp)
