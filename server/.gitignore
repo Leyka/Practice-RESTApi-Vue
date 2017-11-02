@@ -1,0 +1,4 @@
+# Ignore Python files
+*.pyc
+*.db
+venv/
