@@ -25,7 +25,7 @@ def token_required(f):
     except: 
       return make_response(jsonify({'message' : 'Token is invalid'}), 401)
     # Everything is good, pass the current user to the route 
-    return f( *args, **kwargs)
+    return f(*args, current_user, **kwargs)
 
   return decorated
 

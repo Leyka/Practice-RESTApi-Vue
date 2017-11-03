@@ -38,14 +38,14 @@ class UserIdREST(Resource):
 class UserREST(Resource): 
   # Return all users
   @token_required
-  def get(self): 
+  def get(self, current_user): 
     users = User.query.all() 
     # Parse SQLAlchemy data to json data
     output = []
     for user in users: 
       output.append(user.to_dict())
 
-    return jsonify({'users' : output})
+    return jsonify({'current' : current_user.email, 'users' : output})
 
     # Create new user
   def post(self): 
