@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from api import app, db
 from api.models import User
 from api.utils.security import token_required
-import secrets, jwt, datetime
+import secrets, datetime, jwt
 
 def check_and_get_user(public_id): 
   """ Returns object user if this user exists in DB""" 
@@ -16,7 +16,6 @@ def check_and_get_user(public_id):
 
 class UserIdREST(Resource):
   # Returns a specific user 
-  @token_required
   def get(self, public_id): 
     user = check_and_get_user(public_id)
     return jsonify({'user' : user.to_dict()})
@@ -38,6 +37,7 @@ class UserIdREST(Resource):
 
 class UserREST(Resource): 
   # Return all users
+  @token_required
   def get(self): 
     users = User.query.all() 
     # Parse SQLAlchemy data to json data
@@ -67,11 +67,11 @@ class LogInREST(Resource):
   def get(self):
     auth = request.authorization
     if not (auth or auth.username or auth.password): 
-      return make_response('Could not verify user', 401, {'WWW-Authenticate' : 'Basic realm="Unauthorized"'})
+      return make_response(jsonify({'message' : 'Unauthorized'}), 401, {'WWW-Authenticate' : 'Basic realm="Unauthorized"'})
 
     user = User.query.filter_by(username=auth.username).first()
     if not user: 
-      return make_response('Could not verify user', 401, {'WWW-Authenticate' : 'Basic realm="Invalid email or password"'})
+      return make_response(jsonify({'message' : 'Invalid email or password'}), 401, {'WWW-Authenticate' : 'Basic realm="Invalid email or password"'})
     
     if check_password_hash(user.password, auth.password):
       # User found: we generate a Json Web Token (JWT)
@@ -80,4 +80,4 @@ class LogInREST(Resource):
         'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=60)}, app.config['SECRET_KEY'])
       return jsonify({'token' :  token.decode('UTF-8')})
     else: 
-      return make_response('Could not verify user', 401, {'WWW-Authenticate' : 'Basic realm="Invalid email or password"'})
+      return make_response(jsonify({'message' : 'Invalid email or password'}), 401, {'WWW-Authenticate' : 'Basic realm="Invalid email or password"'})
