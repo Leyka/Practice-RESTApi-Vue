@@ -1,5 +1,5 @@
 import os, binascii
-from flask import Flask, Blueprint
+from flask import Flask, Blueprint, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api
 
@@ -19,3 +19,14 @@ api.add_resource(UserIdREST, '/user/<public_id>')
 api.add_resource(LogInREST, '/login')
 
 app.register_blueprint(api_bp)
+
+@app.errorhandler(404)
+def not_found(error=None):
+    message = {
+      'status': 404, 
+      'message': 'Page not found',
+      'url': request.url
+    }
+    response = jsonify(message)
+    response.status_code = 404
+    return response
